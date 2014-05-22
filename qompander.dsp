@@ -40,9 +40,9 @@ olli2(x) = x:tf2(0.479401, 0, -1, -0, -0.479401):tf2(0.876218, 0, -1, -0, -0.876
 //olli2(x) = biquad(x, 0, 0.479401, 0.479401, 0, -1):biquad(_, 0, 0.876218, 0.876218, 0, -1):biquad(_, 0, 0.976599, 0.976599, 0, -1):biquad(_, 0, 0.9975, 0.9975, 0, -1);
 
 
-pyth(x) = sqrt((olli1(x)*olli1(x))+(olli2(x)*olli2(x))):max(0.00001); //compute instantaneous amplitudes
+pyth(x) = sqrt((olli1(x)*olli1(x))+(olli2(x)*olli2(x))):max(0.00001):min(100); //compute instantaneous amplitudes
 attackDecay(x) = pyth(x) :amp_follower_ud(attack/1000,release/1000);
-mapping(x) = attackDecay(x) : (exponent,(sin((min(1/factor)*(factor/4)) / (2*PI)): max(0.0000001)) : pow );
+mapping(x) = attackDecay(x) : (exponent,(sin((min(1/factor)*(factor/4)) / (2*PI)): max(0.0000001):min(1)) : pow );
 qompander(x) = (mapping(x) / attackDecay(x))<: (_,olli1(x):*),(_,olli2(x):*):+:_*(sqrt(0.5));
 
 //bc(x) = biquad(x, 1, -1.41421, 1, 1.41407, -0.9998);
