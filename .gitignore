@@ -2,7 +2,7 @@
 ## FAUST
 #################
 
-#*.svg
+*.svg
 *.tmp.cpp
 *.tmp.dsp
 *.temp-svg
