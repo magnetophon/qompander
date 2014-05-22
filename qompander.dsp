@@ -30,7 +30,7 @@ release		= qompanderGroup(hslider("[4] release[unit: ms]",	20, 20, 1000, 1):smoo
 magnitude = (point):db2linear;
 exponent = log(magnitude)/log(sin(factor*magnitude*PI/2));
 
-// to go from puredata biquad coefficients to max/msp and faust notation: thee first two parameters are negated and put last
+// to go from puredata biquad coefficients to max/msp and faust notation: the first two parameters are negated and put last
 olli1(x) = x:		tf2(0.161758, 0, -1, -0, -0.161758):tf2(0.733029, 0, -1, -0, -0.733029):tf2(0.94535 , 0, -1, -0, -0.94535 ):tf2(0.990598, 0, -1, -0, -0.990598);
 olli2(x) = x:mem:	tf2(0.479401, 0, -1, -0, -0.479401):tf2(0.876218, 0, -1, -0, -0.876218):tf2(0.976599, 0, -1, -0, -0.976599):tf2(0.9975  , 0, -1, -0, -0.9975  );
 
@@ -42,16 +42,20 @@ olli2(x) = x:mem:	tf2(0.479401, 0, -1, -0, -0.479401):tf2(0.876218, 0, -1, -0, -
 //olli1(x) = biquad(x, 0, 0.161758, 0.161758, 0, -1):biquad(_, 0, 0.733029, 0.733029, 0, -1):biquad(_, 0, 0.94535, 0.94535, 0, -1):biquad(_, 0, 0.990598, 0.990598, 0, -1);
 //olli2(x) = biquad(x, 0, 0.479401, 0.479401, 0, -1):biquad(_, 0, 0.876218, 0.876218, 0, -1):biquad(_, 0, 0.976599, 0.976599, 0, -1):biquad(_, 0, 0.9975, 0.9975, 0, -1);
 
+//bc(x) = biquad(x, 1, -1.41421, 1, 1.41407, -0.9998);
+//xbc(x) = x:tf2np(1, -1.41421, 1, 1.41407, -0.9998);
+
 
 pyth(x) = sqrt((olli1(x)*olli1(x))+(olli2(x)*olli2(x))):max(0.00001):min(100); //compute instantaneous amplitudes
 attackDecay(x) = pyth(x) :amp_follower_ud(attack/1000,release/1000);
 mapping(x) = attackDecay(x) : (exponent,(sin((min(1/factor)*(factor/4)) * (2*PI)): max(0.0000001):min(1)) : pow );
 qompander(x) = (mapping(x) / attackDecay(x))<: (_,olli1(x):*),(_,olli2(x):*):+:_*(sqrt(0.5));
 
-//bc(x) = biquad(x, 1, -1.41421, 1, 1.41407, -0.9998);
-bc(x) = x:tf2np(1, -1.41421, 1, 1.41407, -0.9998);
-gain = hslider("gain", 60, 0, 1, 0)*0.01:smooth(0.999);
-process(x) =qompander(x*gain);
+
+gain = hslider("gain", 60, 0, 1, 0)*0.001:smooth(0.999);
+envelope	= abs : max ~ -(1.0/SR) : max(db2linear(-70)) : linear2db;
+OutMeter =  _<:_,(envelope:hbargraph("[2][unit:dB][tooltip: output level in dB]", -70, +6)):attach;
+process(x) = qompander(x*gain):OutMeter;
 //oscrs(5512.5):bc(_);
 //oscrs(vslider("foo", 2000, 2000, 6000, 0.1)) : bc(x);
 //hslider("foo", -100, -100, 80, 0):db2linear:hbargraph("bar", 0, 0.1);
