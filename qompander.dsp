@@ -19,7 +19,7 @@ import ("effect.lib");
 qompanderGroup(x)  = (vgroup("[1] qompander [tooltip: Reference: http://www.katjaas.nl/compander/compander.html]", x));
 meter		= qompanderGroup(hbargraph("meter", 0, 1));
 factor		= qompanderGroup(hslider("[1] factor[unit::1]"	,	3, 0.8, 8, 0):smooth(0.999));
-threshold		= qompanderGroup(hslider("[2] threshold [unit: dB]"	,	-40, -96, -20, 0):smooth(0.999));
+threshold	= qompanderGroup(hslider("[2] threshold [unit: dB]"	,	-40, -96, -20, 0):smooth(0.999));
 attack		= qompanderGroup(hslider("[3] attack[unit: ms]"	,	1, 1, 20, 0):smooth(0.999));
 release		= qompanderGroup(hslider("[4] release[unit: ms]",	20, 20, 1000, 1):smooth(0.999));
 
