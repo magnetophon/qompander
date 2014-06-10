@@ -1,5 +1,5 @@
 declare name 		"qompander";
-declare version 	"1.0";
+declare version 	"1.1";
 declare author 		"Bart Brouns";
 declare license 	"GNU 3.0";
 declare copyright 	"(c) Bart Brouns 2014";
@@ -16,14 +16,11 @@ import ("effect.lib");
 //-----------------------------------------------
 // the GUI
 //-----------------------------------------------
-qompanderGroup(x)  = (vgroup("[1] qompander [tooltip: Reference: http://www.katjaas.nl/compander/compander.html]", x));
-meter		= qompanderGroup(hbargraph("meter", 0, 1));
-factor		= qompanderGroup(hslider("[1] factor[unit::1]"	,	3, 0.8, 8, 0):smooth(0.999));
-threshold	= qompanderGroup(hslider("[2] threshold [unit: dB]"	,	-40, -96, -20, 0):smooth(0.999));
-attack		= qompanderGroup(hslider("[3] attack[unit: ms]"	,	1, 1, 20, 0):smooth(0.999));
-release		= qompanderGroup(hslider("[4] release[unit: ms]",	20, 20, 1000, 1):smooth(0.999));
-
-
+qompanderGroup(x)  = (vgroup("[0] qompander [tooltip: Reference: http://www.katjaas.nl/compander/compander.html]", x));
+factor		= qompanderGroup(hslider("[0] factor[unit::1]",		3, 0.8, 8, 0):smooth(0.999));
+threshold	= qompanderGroup(hslider("[1] threshold [unit: dB]",	-40, -96, -20, 0):smooth(0.999));
+attack		= qompanderGroup(hslider("[2] attack[unit: ms]",	1, 1, 20, 0):smooth(0.999));
+release		= qompanderGroup(hslider("[3] release[unit: ms]",	20, 20, 1000, 0):smooth(0.999));
 
 //-----------------------------------------------
 // the DSP
@@ -40,11 +37,5 @@ pyth(x) = sqrt((olli1(x)*olli1(x))+(olli2(x)*olli2(x))):max(0.00001):min(100); /
 attackDecay(x) = pyth(x) :amp_follower_ud(attack/1000,release/1000);
 mapping(x) = attackDecay(x) : ((sin((min(1/factor)*(factor/4)) * (2*PI)): max(0.0000001):min(1),exponent) : pow );
 qompander(x) = (mapping(x) / attackDecay(x))<: (_,olli1(x):*),(_,olli2(x):*):+:_*(sqrt(0.5));
-
-//optional gain and output meter
-//gain = hslider("gain", 60, 0, 1, 0):smooth(0.999);
-envelope	= abs : max ~ -(1.0/SR) : max(db2linear(-70)) : linear2db;
-OutMeter =  _<:_,(envelope:hbargraph("[2][unit:dB][tooltip: output level in dB]", -70, +6)):attach;
-//tstMeter =  _<:_,(abs : max ~ -(1.0/SR):hbargraph("TST", 0, 1)):attach;
 
 process(x) = qompander(x);
