@@ -5,7 +5,7 @@ declare license 	"GNU 3.0";
 declare copyright 	"(c) Bart Brouns 2014";
 declare credits		"ported from qompander in pd by Katja Vetter";
 declare see		"http://www.katjaas.nl/compander/compander.html";
-declare additional	"filter coefficients by Olli Niemitalo"
+declare additional	"filter coefficients by Olli Niemitalo";
 
 //-----------------------------------------------
 // imports
